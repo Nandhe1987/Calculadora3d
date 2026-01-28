@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Preço - Impressão 3D</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+                'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+            background: linear-gradient(135deg, #e0f2fe 0%, #e0e7ff 100%);
+            min-height: 100vh;
+            padding: 1rem;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            color: #64748b;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .card h2 {
+            font-size: 1.5rem;
+            color: #1e293b;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .form-group small {
+            display: block;
+            font-size: 0.85rem;
+            color: #94a3b8;
+            margin-top: 0.25rem;
+        }
+
+        .result-box {
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .result-box.blue {
+            background: linear-gradient(135deg, #dbeafe 0%, #e0f2fe 100%);
+            border-left: 4px solid #3b82f6;
+        }
+
+        .result-box.green {
+            background: linear-gradient(135deg, #dcfce7 0%, #e0f2fe 100%);
+            border-left: 4px solid #22c55e;
+        }
+
+        .result-box.yellow {
+            background: linear-gradient(135deg, #fef3c7 0%, #fef08a 100%);
+            border-left: 4px solid #eab308;
+        }
+
+        .result-label {
+            color: #475569;
+            font-weight: 500;
+        }
+
+        .result-value {
+            font-size: 1.75rem;
+            font-weight: bold;
+        }
+
+        .result-box.blue .result-value {
+            color: #1e40af;
+        }
+
+        .result-box.green .result-value {
+            color: #166534;
+        }
+
+        .result-box.yellow .result-value {
+            color: #854d0e;
+        }
+
+        .result-detail {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-top: 0.5rem;
+        }
+
+        .pricing-card {
+            background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%);
+            color: white;
+            border-radius: 1.5rem;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(124, 58, 237, 0.3);
+        }
+
+        .pricing-card h2 {
+            color: white;
+            margin-bottom: 1.5rem;
+        }
+
+        .price-display {
+            margin-bottom: 1.5rem;
+        }
+
+        .price-label {
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 0.5rem;
+        }
+
+        .price-value {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .price-multiplier {
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .margin-section {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .margin-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+        }
+
+        .margin-label {
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+        }
+
+        .margin-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 0.5rem;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 0.25rem;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: white;
+            border-radius: 0.25rem;
+            transition: width 0.3s ease;
+        }
+
+        .tip-box {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            margin-top: 1.5rem;
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.95);
+        }
+
+        .info-card {
+            background: #f0f9ff;
+            border: 2px solid #0284c7;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .info-card h3 {
+            color: #0c4a6e;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .info-card ul {
+            list-style: none;
+            color: #334155;
+            font-size: 0.95rem;
+        }
+
+        .info-card li {
+            margin-bottom: 0.5rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .info-card li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #0284c7;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💎 Calculadora 3D</h1>
+            <p>Calcule o preço ideal para suas peças impressas em 3D</p>
+        </div>
+
+        <div class="grid">
+            <!-- Input Section -->
+            <div class="card">
+                <h2>📋 Parâmetros</h2>
+
+                <div class="form-group">
+                    <label for="filamentCost">Custo do Filamento (R$/kg)</label>
+                    <input type="number" id="filamentCost" value="120" step="0.01">
+                    <small>Preço do rolo de filamento por kg</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="filamentWeight">Peso da Peça (g)</label>
+                    <input type="number" id="filamentWeight" value="148" step="0.1">
+                    <small>Peso total do filamento usado</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="printTime">Tempo de Impressão (horas)</label>
+                    <input type="number" id="printTime" value="4.4" step="0.1">
+                    <small>Duração total da impressão</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="printerPower">Potência da Impressora (W)</label>
+                    <input type="number" id="printerPower" value="150" step="1">
+                    <small>Consumo médio em watts</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="electricityCost">Custo da Eletricidade (R$/kWh)</label>
+                    <input type="number" id="electricityCost" value="0.74" step="0.01">
+                    <small>Tarifa de energia elétrica</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="priceMultiplier">Multiplicador de Preço (margem)</label>
+                    <input type="number" id="priceMultiplier" value="3.0" step="0.1">
+                    <small>Ex: 2.5, 3.0, 3.5 (recomendado: 3.0)</small>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div>
+                <div class="card">
+                    <h2>💰 Custos Detalhados</h2>
+
+                    <div class="result-box blue">
+                        <div>
+                            <div class="result-label">Custo do Filamento</div>
+                            <div class="result-detail" id="filamentDetail"></div>
+                        </div>
+                        <div class="result-value" id="filamentCostResult">R$ 0,00</div>
+                    </div>
+
+                    <div class="result-box green">
+                        <div>
+                            <div class="result-label">Custo de Energia</div>
+                            <div class="result-detail" id="energyDetail"></div>
+                        </div>
+                        <div class="result-value" id="energyCostResult">R$ 0,00</div>
+                    </div>
+
+                    <div class="result-box yellow">
+                        <div>
+                            <div class="result-label">Custo Total Direto</div>
+                            <div class="result-detail">Filamento + Energia</div>
+                        </div>
+                        <div class="result-value" id="totalCostResult">R$ 0,00</div>
+                    </div>
+                </div>
+
+                <div class="pricing-card">
+                    <h2>🎯 Preço de Venda</h2>
+
+                    <div class="price-display">
+                        <div class="price-label">Preço Sugerido</div>
+                        <div class="price-value" id="priceResult">R$ 0,00</div>
+                        <div class="price-multiplier" id="multiplierDisplay">Multiplicador: 3.0x</div>
+                    </div>
+
+                    <div class="margin-section">
+                        <div class="margin-header">
+                            <span class="margin-label">Margem de Lucro</span>
+                            <span class="margin-value" id="marginResult">0%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="marginBar" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <div class="tip-box">
+                        💡 <strong>Dica:</strong> Uma margem entre 50-80% é considerada saudável para produtos artesanais.
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <h3>📌 Como usar:</h3>
+                    <ul>
+                        <li>Ajuste os parâmetros conforme sua impressora e custos</li>
+                        <li>O preço se atualiza automaticamente</li>
+                        <li>Teste diferentes multiplicadores para encontrar o melhor preço</li>
+                        <li>Considere custos indiretos (manutenção, tempo, embalagem)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const inputs = {
+            filamentCost: document.getElementById('filamentCost'),
+            filamentWeight: document.getElementById('filamentWeight'),
+            printTime: document.getElementById('printTime'),
+            printerPower: document.getElementById('printerPower'),
+            electricityCost: document.getElementById('electricityCost'),
+            priceMultiplier: document.getElementById('priceMultiplier')
+        };
+
+        const results = {
+            filamentCostResult: document.getElementById('filamentCostResult'),
+            filamentDetail: document.getElementById('filamentDetail'),
+            energyCostResult: document.getElementById('energyCostResult'),
+            energyDetail: document.getElementById('energyDetail'),
+            totalCostResult: document.getElementById('totalCostResult'),
+            priceResult: document.getElementById('priceResult'),
+            marginResult: document.getElementById('marginResult'),
+            marginBar: document.getElementById('marginBar'),
+            multiplierDisplay: document.getElementById('multiplierDisplay')
+        };
+
+        function formatCurrency(value) {
+            return 'R$ ' + value.toFixed(2).replace('.', ',');
+        }
+
+        function updateCalculations() {
+            const filamentCost = parseFloat(inputs.filamentCost.value) || 0;
+            const filamentWeight = parseFloat(inputs.filamentWeight.value) || 0;
+            const printTime = parseFloat(inputs.printTime.value) || 0;
+            const printerPower = parseFloat(inputs.printerPower.value) || 0;
+            const electricityCost = parseFloat(inputs.electricityCost.value) || 0;
+            const priceMultiplier = parseFloat(inputs.priceMultiplier.value) || 1;
+
+            // Cálculos
+            const filamentCostPerGram = filamentCost / 1000;
+            const filamentCostPiece = filamentCostPerGram * filamentWeight;
+
+            const energyConsumed = (printerPower / 1000) * printTime;
+            const energyCostPiece = energyConsumed * electricityCost;
+
+            const totalDirectCost = filamentCostPiece + energyCostPiece;
+            const suggestedPrice = totalDirectCost * priceMultiplier;
+
+            const margin = totalDirectCost > 0 
+                ? ((suggestedPrice - totalDirectCost) / suggestedPrice * 100)
+                : 0;
+
+            // Atualizar resultados
+            results.filamentCostResult.textContent = formatCurrency(filamentCostPiece);
+            results.filamentDetail.textContent = `${filamentWeight}g × R$ ${filamentCostPerGram.toFixed(4)}/g`;
+
+            results.energyCostResult.textContent = formatCurrency(energyCostPiece);
+            results.energyDetail.textContent = `${energyConsumed.toFixed(2)} kWh × R$ ${electricityCost}/kWh`;
+
+            results.totalCostResult.textContent = formatCurrency(totalDirectCost);
+
+            results.priceResult.textContent = formatCurrency(suggestedPrice);
+            results.multiplierDisplay.textContent = `Multiplicador: ${priceMultiplier.toFixed(1)}x`;
+
+            results.marginResult.textContent = margin.toFixed(1) + '%';
+            results.marginBar.style.width = Math.min(margin, 100) + '%';
+        }
+
+        // Adicionar listeners
+        Object.values(inputs).forEach(input => {
+            input.addEventListener('input', updateCalculations);
+        });
+
+        // Cálculo inicial
+        updateCalculations();
+    </script>
+</body>
+</html>
